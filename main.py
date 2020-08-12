@@ -28,7 +28,7 @@ class AppController():
         S = librosa.amplitude_to_db(abs(X))
         plt.figure(figsize=(15,5))
         librosa.display.specshow(S, sr=8000, hop_length=80, x_axis='time', y_axis='log')
-        plt.colorbar(format='%+2.0f dB')
+        #plt.colorbar(format='%+2.0f dB')
         plt.show()
         print("debug")
 
@@ -45,6 +45,6 @@ def main():
     print("debug")
 
 if __name__ == "__main__":
-   main()
+    main()
 
 
