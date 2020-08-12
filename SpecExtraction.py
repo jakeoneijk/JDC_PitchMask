@@ -22,7 +22,8 @@ class SpecExtraction():
         return X
 
     def after_processing(self,X,win_size):
-        x_spec = np.abs(X)
+        x_spec = X
+        #x_spec = np.abs(x_spec)
         x_spec  = librosa.core.power_to_db(x_spec,ref=np.max)
         x_spec = x_spec.astype(np.float32)
         num_frames = x_spec.shape[1]
