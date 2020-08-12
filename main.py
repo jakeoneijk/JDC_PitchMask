@@ -42,7 +42,6 @@ def main():
     app_controller.spec_extraction.inverse_stft(app_controller.X * app_controller.mask_f0)
 
     app_controller.plot(app_controller.X * app_controller.mask_f0)
-    print(len(app_controller.X[0]))
     print("debug")
 
 if __name__ == "__main__":

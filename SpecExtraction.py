@@ -24,8 +24,8 @@ class SpecExtraction():
     def after_processing(self,X,win_size):
         x_spec = X
         #x_spec = np.abs(x_spec)
-        x_spec  = librosa.core.power_to_db(x_spec,ref=np.max)
-        x_spec = x_spec.astype(np.float32)
+        #x_spec  = librosa.core.power_to_db(x_spec,ref=np.max)
+        #x_spec = x_spec.astype(np.float32)
         num_frames = x_spec.shape[1]
         padNum = num_frames % win_size
         if padNum != 0:
