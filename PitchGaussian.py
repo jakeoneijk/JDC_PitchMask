@@ -1,35 +1,51 @@
 import numpy as np
-import cv2
+import math
+
 
 class PitchGaussian():
-    def __init__(self):
+    def __init__(self,sampling_rate,fft_size,max_frequency_index):
+        self.sampling_rate = sampling_rate
+        self.fft_size = fft_size
+        self.max_frequency_index = max_frequency_index
         self.f0_array = None
-        self.f0_array_transform = np.zeros((513, 2480))
-        self.max_frequency_index = 513
-        self.kernel_size = 200
-        self.sigma = 3
+        self.kernel_size = 100
+        self.sigma = 10
+        self.W = 10
 
     def file_path_to_narray(self,filepath):
         narray = np.loadtxt(filepath, delimiter=" ")
         self.f0_array = narray[:,1]
         return self.f0_array
-    
-    def hz_to_bin(self,sr,fft_size):
-        f0_bin = np.around((self.f0_array / sr) * fft_size)
-        return f0_bin
 
-    def matrix_fit_to_spectro(self,f0_bin):
-        kernel = cv2.getGaussianKernel(self.kernel_size, self.sigma)
+    def hz_to_bin(self,hz):
+        return int((hz / self.sampling_rate) * self.fft_size)
 
-        for i in range(0,len(f0_bin)):
+    def bin_to_hz(self,bin):
+        return (bin / self.fft_size) * self.sampling_rate
+
+    def gaussian_function_array(self,mean,variance,x):
+        denominator = math.sqrt(float(2 * math.pi * (variance ** 2)))
+        return self.W * np.exp(-1 * (((x - mean) ** 2)/(2 * (variance ** 2)))) / denominator
+
+    def hz_to_gaussian_kernel(self,hz):
+        bin_of_hz = self.hz_to_bin(hz)
+        start_index = max((bin_of_hz - int(self.kernel_size / 2)),0)
+        end_index = min((bin_of_hz + int(self.kernel_size / 2)),self.max_frequency_index)
+
+        bin_array = np.arange(start_index , end_index)
+        bin_to_hz_array = self.bin_to_hz(bin_array)
+        gaussian_value = self.gaussian_function_array(hz,self.sigma,bin_to_hz_array)
+        return gaussian_value,start_index,end_index
+
+    def matrix_fit_to_spectro(self,number_time_frame):
+        f0_array_transform = np.zeros((self.max_frequency_index, number_time_frame))
+        for i in range(0,len(self.f0_array)):
             print(i)
             time_index = int(i)
-            frequency_index = int(f0_bin[i])
-            while frequency_index < self.max_frequency_index and frequency_index != 0:
-                for k in range(0,self.kernel_size):
-                    fre_index = frequency_index - int(self.kernel_size/2) + k
-                    if fre_index >= 0 and fre_index < 513:
-                        self.f0_array_transform[fre_index,time_index] = self.f0_array_transform[fre_index,time_index]+ kernel[k][0]
-                frequency_index = frequency_index + int(f0_bin[i])
+            masking_hz = self.f0_array[i]
+            while masking_hz < (self.sampling_rate/2) and masking_hz != 0:
+                gaussian_array,start_index,end_index = self.hz_to_gaussian_kernel(masking_hz)
+                f0_array_transform[start_index:end_index,time_index] = f0_array_transform[start_index:end_index,time_index] + gaussian_array
+                masking_hz = masking_hz + self.f0_array[i]
 
-        return self.f0_array_transform
+        return f0_array_transform
