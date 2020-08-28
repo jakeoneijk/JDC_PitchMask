@@ -8,9 +8,9 @@ class PitchGaussian():
         self.fft_size = fft_size
         self.max_frequency_index = max_frequency_index
         self.f0_array = None
-        self.kernel_size = 100
+        self.kernel_size = 50
         self.sigma = 10
-        self.W = 10
+        self.W = 20
 
     def file_path_to_narray(self,filepath):
         narray = np.loadtxt(filepath, delimiter=" ")

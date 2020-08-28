@@ -40,9 +40,9 @@ class StftFitToModel():
 
         return x_spec
     
-    def inverse_stft(self,stft_mat):
+    def inverse_stft(self,stft_mat,name):
         iStftMat = librosa.core.istft(stft_mat, hop_length=self.hop_length)
-        filename = "./testOut"+ time.strftime('%c', time.localtime(time.time()))+".wav"
+        filename = "./testOut"+ time.strftime('%c', time.localtime(time.time()))+"_"+name+".wav"
         sf.write(filename, iStftMat, self.sampling_rate)
         return iStftMat
 

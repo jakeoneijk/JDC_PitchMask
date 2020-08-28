@@ -9,7 +9,7 @@ class AppController():
     def __init__(self):
         self.stft_fit_to_model = StftFitToModel.StftFitToModel()
         self.pitch_gaussian = PitchGaussian.PitchGaussian(self.stft_fit_to_model.sampling_rate,self.stft_fit_to_model.number_fft,self.stft_fit_to_model.max_frequency_index)
-        self.test_file_name = 'train02.wav'
+        self.test_file_name = 'train05.wav'
         self.test_file_path = './Data/mirex05TrainFiles/' + self.test_file_name
         self.test_pitch_path = './Data/labrosa_pitch/pitch_'+self.test_file_name+'.txt'
 
@@ -25,15 +25,14 @@ class AppController():
         S = librosa.amplitude_to_db(abs(X))
         plt.figure(figsize=(15,5))
         librosa.display.specshow(S, sr=self.stft_fit_to_model.sampling_rate, hop_length=self.stft_fit_to_model.hop_length, x_axis='time', y_axis='log')
-        #plt.colorbar(format='%+2.0f dB')
-        plt.show()
         print("debug")
 
     def main_control(self):
         stft_fit_to_model_spectro = self.stft_after_processing()
         making = self.pitch_gaussian_processing()
         masked_spectro = making * stft_fit_to_model_spectro
-        self.stft_fit_to_model.inverse_stft(masked_spectro)
+        self.stft_fit_to_model.inverse_stft(stft_fit_to_model_spectro, "(original)")
+        self.stft_fit_to_model.inverse_stft(masked_spectro,"(masked)")
         self.plot(masked_spectro)
 
         print("debug")
