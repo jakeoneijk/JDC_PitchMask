@@ -9,7 +9,7 @@ class AppController():
     def __init__(self):
         self.stft_fit_to_model = StftFitToModel.StftFitToModel()
         self.pitch_gaussian = PitchGaussian.PitchGaussian(self.stft_fit_to_model.sampling_rate,self.stft_fit_to_model.number_fft,self.stft_fit_to_model.max_frequency_index)
-        self.test_file_name = 'train05.wav'
+        self.test_file_name = 'sun_test1.mp3'
         self.test_file_path = './Data/mirex05TrainFiles/' + self.test_file_name
         self.test_pitch_path = './Data/labrosa_pitch/pitch_'+self.test_file_name+'.txt'
 
@@ -33,6 +33,7 @@ class AppController():
         masked_spectro = making * stft_fit_to_model_spectro
         self.stft_fit_to_model.inverse_stft(stft_fit_to_model_spectro, "(original)")
         self.stft_fit_to_model.inverse_stft(masked_spectro,"(masked)")
+        self.stft_fit_to_model.inverse_stft_griffin_lim(masked_spectro,"(masked g ver)")
         self.plot(masked_spectro)
 
         print("debug")
