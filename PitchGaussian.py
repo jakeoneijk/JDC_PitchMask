@@ -1,6 +1,6 @@
 import numpy as np
 import math
-
+from scipy.interpolate import interp1d
 
 class PitchGaussian():
     def __init__(self,sampling_rate,fft_size,max_frequency_index):
@@ -8,7 +8,7 @@ class PitchGaussian():
         self.fft_size = fft_size
         self.max_frequency_index = max_frequency_index
         self.f0_array = None
-        self.kernel_size = 50
+        self.kernel_size = 40
         self.sigma = 10
         self.W = 20
 
@@ -37,8 +37,17 @@ class PitchGaussian():
         gaussian_value = self.gaussian_function_array(hz,self.sigma,bin_to_hz_array)
         return gaussian_value,start_index,end_index
 
-    def matrix_fit_to_spectro(self,number_time_frame):
-        f0_array_transform = np.zeros((self.max_frequency_index, number_time_frame))
+    def interpolation(self, interpolated_numb):
+        old_indices = np.arange(0, len(self.f0_array))
+        new_indices = np.linspace(0, len(self.f0_array) - 1, interpolated_numb)
+        spl = interp1d(old_indices, self.f0_array, kind='linear')
+        new_array = spl(new_indices)
+        return new_array
+
+    def matrix_fit_to_spectro(self,number_time_frame , spec_number):
+        self.f0_array = self.f0_array[:number_time_frame]
+        self.f0_array = self.interpolation(spec_number)
+        f0_array_transform = np.zeros((self.max_frequency_index, len(self.f0_array)))
         for i in range(0,len(self.f0_array)):
             print(i)
             time_index = int(i)
