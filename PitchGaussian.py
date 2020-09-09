@@ -9,7 +9,7 @@ class PitchGaussian():
         self.max_frequency_index = max_frequency_index
         self.f0_array = None
         self.kernel_size = 40
-        self.sigma = 10
+        self.sigma = 12
         self.W = 20
 
     def file_path_to_narray(self,filepath):
@@ -38,6 +38,8 @@ class PitchGaussian():
         return gaussian_value,start_index,end_index
 
     def interpolation(self, interpolated_numb):
+        if len(self.f0_array) == interpolated_numb:
+            return self.f0_array
         old_indices = np.arange(0, len(self.f0_array))
         new_indices = np.linspace(0, len(self.f0_array) - 1, interpolated_numb)
         spl = interp1d(old_indices, self.f0_array, kind='linear')

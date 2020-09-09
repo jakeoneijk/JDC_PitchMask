@@ -3,7 +3,6 @@ import librosa.display
 import StftFitToModel
 import PitchGaussian
 import matplotlib.pyplot as plt
-import numpy as np
 
 class AppController():
     def __init__(self):
