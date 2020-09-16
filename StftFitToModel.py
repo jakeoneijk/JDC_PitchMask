@@ -38,7 +38,7 @@ class StftFitToModel():
         return istft_mat
 
     def inverse_stft_griffin_lim(self,stft_mat,name):
-        istft_mat = librosa.griffinlim(abs(stft_mat), n_iter=32, hop_length=self.hop_length, win_length=self.window_length, window=self.window_type)
+        istft_mat = librosa.griffinlim(abs(stft_mat), n_iter=50, hop_length=self.hop_length, win_length=self.window_length, window=self.window_type)
         filename = "./Output/testOut" + time.strftime('%c', time.localtime(time.time())) + "_" + name + ".wav"
         sf.write(filename, istft_mat, self.sampling_rate)
         return istft_mat

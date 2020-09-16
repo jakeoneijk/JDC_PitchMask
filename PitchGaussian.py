@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from scipy.interpolate import interp1d
+from matplotlib import pyplot as plt
 
 class PitchGaussian():
     def __init__(self,sampling_rate,fft_size,max_frequency_index):
@@ -44,6 +45,8 @@ class PitchGaussian():
         new_indices = np.linspace(0, len(self.f0_array) - 1, interpolated_numb)
         spl = interp1d(old_indices, self.f0_array, kind='linear')
         new_array = spl(new_indices)
+        plt.plot(np.arange(len(new_array)), new_array)
+        plt.show()
         return new_array
 
     def matrix_fit_to_spectro(self,number_time_frame , spec_number):
