@@ -10,8 +10,8 @@ class StftFitToModel():
         self.sampling_rate = 44100
         self.number_fft = 2048
         self.max_frequency_index = int((self.number_fft / 2) + 1)
-        self.window_length = 2048 #2048
-        self.hop_length = 256 #441
+        self.window_length = 1764 #1764 #2048
+        self.hop_length = 441 #441
         self.hop_length_for_pitch_data_length = int(self.sampling_rate / 100)
         self.model_input_size = 31
         self.window_type = 'hann'

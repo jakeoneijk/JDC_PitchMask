@@ -8,17 +8,19 @@ class AppController():
     def __init__(self):
         self.stft_fit_to_model = StftFitToModel.StftFitToModel()
         self.pitch_gaussian = PitchGaussian.PitchGaussian(self.stft_fit_to_model.sampling_rate,self.stft_fit_to_model.number_fft,self.stft_fit_to_model.max_frequency_index)
-        self.test_file_name = 'train01.wav'
-        self.test_file_path = './Data/mirex05TrainFiles/' + self.test_file_name
-        self.test_pitch_path = './Data/labrosa_pitch/pitch_'+self.test_file_name+'.txt'
+        self.test_file_name = 'opera_fem2'
+        self.extension = '.wav'
+        self.test_file_path = './Data/mirex05TrainFiles/' + self.test_file_name + self.extension
+        self.test_pitch_path = './Data/labrosa_pitch/pitch_'+self.test_file_name + self.extension+'.txt'
+        self.test_ref_pitch_path = './Data/mirex05TrainFiles/' + self.test_file_name + 'REF.txt'
 
     def stft_after_processing(self):
         self.stft_fit_to_model.test_property()
         X , pitch_data_length = self.stft_fit_to_model.stft_and_get_num_time_frame(self.test_file_path)
         return X , pitch_data_length , X.shape[1]
 
-    def pitch_gaussian_processing(self,pitch_data_length, num_spec):
-        self.pitch_gaussian.file_path_to_narray(self.test_pitch_path)
+    def pitch_gaussian_processing(self,pitch_path,pitch_data_length, num_spec,isRef):
+        self.pitch_gaussian.file_path_to_narray(pitch_path,isRef)
         return self.pitch_gaussian.matrix_fit_to_spectro(pitch_data_length, num_spec)
 
     def plot(self,X):
@@ -28,12 +30,20 @@ class AppController():
 
     def main_control(self):
         stft_fit_to_model_spectro , pitch_data_length , num_spec = self.stft_after_processing()
-        making = self.pitch_gaussian_processing(pitch_data_length, num_spec)
+        making = self.pitch_gaussian_processing(self.test_pitch_path, pitch_data_length, num_spec,False)
         masked_spectro = making * stft_fit_to_model_spectro
+        '''
+        if self.test_ref_pitch_path != None:
+            masking_ref = self.pitch_gaussian_processing(self.test_ref_pitch_path, pitch_data_length, num_spec,True)
+            masked_spectro_ref = masking_ref * stft_fit_to_model_spectro
+            self.stft_fit_to_model.inverse_stft_griffin_lim(masked_spectro_ref, "(masked ref griffin)")
+            self.stft_fit_to_model.inverse_stft(masked_spectro_ref, "(masked ref)")
+        '''
         self.stft_fit_to_model.inverse_stft(stft_fit_to_model_spectro, "(original)")
-        self.stft_fit_to_model.inverse_stft(masked_spectro,"(masked)")
-        self.stft_fit_to_model.inverse_stft_griffin_lim(masked_spectro,"(masked g ver)")
+        self.stft_fit_to_model.inverse_stft_griffin_lim(masked_spectro,"(masked griffin)")
+        self.stft_fit_to_model.inverse_stft(masked_spectro, "(masked)")
         self.plot(masked_spectro)
+        self.plot(making)
         print("debug")
 
 if __name__ == "__main__":
