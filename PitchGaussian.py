@@ -9,8 +9,8 @@ class PitchGaussian():
         self.fft_size = fft_size
         self.max_frequency_index = max_frequency_index
         self.f0_array = None
-        self.kernel_size = 35 #8
-        self.sigma = 30
+        self.kernel_size = 12 #8
+        self.sigma = 25
         self.weight = 1.1
         self.sigma_increase_ration = 1.2
 
@@ -34,10 +34,10 @@ class PitchGaussian():
         max_value = np.max(gaussian)
         return self.weight * (gaussian / max_value)
 
-    def hz_to_gaussian_kernel(self,hz,harmony_index):
+    def hz_to_gaussian_kernel(self,hz,harmony_index , kernel_size):
         bin_of_hz = self.hz_to_bin(hz)
-        start_index = max((bin_of_hz - int(self.kernel_size / 2)),0)
-        end_index = min((bin_of_hz + int(self.kernel_size / 2)),self.max_frequency_index)
+        start_index = max((bin_of_hz - int(kernel_size / 2)),0)
+        end_index = min((bin_of_hz + int(kernel_size / 2)),self.max_frequency_index)
 
         bin_array = np.arange(start_index , end_index)
         bin_to_hz_array = self.bin_to_hz(bin_array)
@@ -65,7 +65,7 @@ class PitchGaussian():
             masking_hz = self.f0_array[i]
             harmony_index = 1
             while masking_hz < (self.sampling_rate/2) and masking_hz != 0:
-                gaussian_array,start_index,end_index = self.hz_to_gaussian_kernel(masking_hz,harmony_index)
+                gaussian_array,start_index,end_index = self.hz_to_gaussian_kernel(masking_hz,harmony_index , self.kernel_size * self.sigma_increase_ration)
                 f0_array_transform[start_index:end_index,time_index] = f0_array_transform[start_index:end_index,time_index] + gaussian_array
                 masking_hz = masking_hz + self.f0_array[i]
                 harmony_index = harmony_index * self.sigma_increase_ration
