@@ -28,7 +28,8 @@ class StftFitToModel():
     def stft_and_get_num_time_frame(self,file_name):
         y, sr = librosa.load(file_name, sr=self.sampling_rate)
         X = librosa.core.stft(y, n_fft=self.number_fft, hop_length=self.hop_length, win_length=self.window_length , window=self.window_type)
-        pitch_data_length = int(ceil((y.size) / self.hop_length_for_pitch_data_length))
+        #pitch_data_length = int(ceil((y.size) / self.hop_length_for_pitch_data_length))
+        pitch_data_length = X.shape[1]
         return X , pitch_data_length
     
     def inverse_stft(self,stft_mat,name):
